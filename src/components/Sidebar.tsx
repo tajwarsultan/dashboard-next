@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-// Define the structure of our navigation items
 interface NavItem {
   href: string;
   label: string;
@@ -57,7 +56,7 @@ const footerItems: NavItem[] = [
 
 const Sidebar: React.FC = () => {
   return (
-    <div className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 w-64 bg-white shadow-md">
+    <div className="hidden lg:flex flex-col fixed left-0 z-20 top-16 bottom-0 w-64 bg-white shadow-md">
       {/* Main Navigation Section */}
       <nav className="flex-grow p-4 space-y-2">
         {navItems.map((item) => (

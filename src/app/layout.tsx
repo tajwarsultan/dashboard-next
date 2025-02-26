@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-gray-100`}>
         <TopBar />
-        <div className="flex">
+        <div className="flex gap-10">
           <div>
             <Sidebar />
           </div>
