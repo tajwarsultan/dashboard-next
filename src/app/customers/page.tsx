@@ -24,7 +24,7 @@ export default function CustomerDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const [customers] = useState<Customer[]>([
+  const [customers, setCustomers] = useState<Customer[]>([
     { 
       id: 1, 
       name: 'John Doe', 
@@ -116,11 +116,12 @@ export default function CustomerDashboard() {
   const [sortField, setSortField] = useState<keyof Customer>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  // Add new state for modals
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
+  const [isMenuOpen, setIsMenuOpen] = useState<number | null>(null);
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -153,7 +154,6 @@ export default function CustomerDashboard() {
 
   const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
 
-  // Add handlers for customer actions
   const handleEditCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
     setIsEditModalOpen(true);
@@ -167,6 +167,37 @@ export default function CustomerDashboard() {
   const handleStatusChange = (customer: Customer) => {
     setSelectedCustomer(customer);
     setIsStatusModalOpen(true);
+  };
+
+  const handleSaveEdit = (updatedCustomer: Customer) => {
+    setCustomers(prevCustomers =>
+      prevCustomers.map(customer =>
+        customer.id === updatedCustomer.id ? updatedCustomer : customer
+      )
+    );
+    setIsEditModalOpen(false);
+  };
+
+  const handleStatusUpdate = (newStatus: string) => {
+    if (!selectedCustomer) return;
+    
+    setCustomers(prevCustomers =>
+      prevCustomers.map(customer =>
+        customer.id === selectedCustomer.id
+          ? { ...customer, status: newStatus }
+          : customer
+      )
+    );
+    setIsStatusModalOpen(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!selectedCustomer) return;
+    
+    setCustomers(prevCustomers =>
+      prevCustomers.filter(customer => customer.id !== selectedCustomer.id)
+    );
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -207,8 +238,7 @@ export default function CustomerDashboard() {
         </div>
       </div>
       
-      {/* Customer Table */}
-      <div className="overflow-x-auto bg-white rounded border">
+      <div className="bg-white rounded border">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -281,26 +311,37 @@ export default function CustomerDashboard() {
                       >
                         Edit
                       </button>
-                      <div className="relative group">
-                        <button className="text-gray-600 hover:text-gray-900">
+                      <div className="relative">
+                        <button 
+                          onClick={() => setIsMenuOpen(isMenuOpen === customer.id ? null : customer.id)}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
                           <MoreHorizontal size={18} />
                         </button>
-                        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
-                          <div className="py-1" role="menu">
-                            <button
-                              onClick={() => handleStatusChange(customer)}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Change Status
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCustomer(customer)}
-                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                            >
-                              Delete Customer
-                            </button>
+                        {isMenuOpen === customer.id && (
+                          <div className="absolute right-0 mt-2 w-48 z-10 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div className="py-1" role="menu">
+                              <button
+                                onClick={() => {
+                                  handleStatusChange(customer);
+                                  setIsMenuOpen(null);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Change Status
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleDeleteCustomer(customer);
+                                  setIsMenuOpen(null);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                              >
+                                Delete Customer
+                              </button>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -317,7 +358,6 @@ export default function CustomerDashboard() {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-700">
           Showing <span className="font-medium">
@@ -359,49 +399,106 @@ export default function CustomerDashboard() {
         </div>
       </div>
 
-      {/* Add Modals */}
       {isEditModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">Edit Customer</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input
-                  type="text"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  defaultValue={selectedCustomer.name}
-                />
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const form = e.target as HTMLFormElement;
+              const formData = new FormData(form);
+              
+              const updatedCustomer = {
+                ...selectedCustomer,
+                name: formData.get('name') as string,
+                email: formData.get('email') as string,
+                phone: formData.get('phone') as string,
+                segment: formData.get('segment') as string,
+                status: selectedCustomer.status,
+                registrationDate: selectedCustomer.registrationDate,
+                lastLogin: selectedCustomer.lastLogin,
+                orderCount: selectedCustomer.orderCount,
+                location: selectedCustomer.location,
+                age: selectedCustomer.age,
+                referredBy: selectedCustomer.referredBy,
+              };
+              
+              handleSaveEdit(updatedCustomer);
+            }}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    name="name"
+                    type="text"
+                    defaultValue={selectedCustomer.name}
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    defaultValue={selectedCustomer.email}
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Phone</label>
+                  <input
+                    name="phone"
+                    type="text"
+                    defaultValue={selectedCustomer.phone}
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Segment</label>
+                  <select
+                    name="segment"
+                    defaultValue={selectedCustomer.segment}
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                  >
+                    <option value="Basic">Basic</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Premium">Premium</option>
+                  </select>
+                </div>
               </div>
-              {/* Add more fields as needed */}
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // Handle save logic here
-                  setIsEditModalOpen(false);
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-              >
-                Save Changes
-              </button>
-            </div>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
       {isStatusModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">Change Status</h2>
             <div className="space-y-4">
-              <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+              <select 
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                defaultValue={selectedCustomer.status}
+                onChange={(e) => handleStatusUpdate(e.target.value)}
+              >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
                 <option value="suspended">Suspended</option>
@@ -415,10 +512,7 @@ export default function CustomerDashboard() {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Handle status change logic here
-                  setIsStatusModalOpen(false);
-                }}
+                onClick={() => handleStatusUpdate(selectedCustomer.status)}
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
               >
                 Update Status
@@ -429,7 +523,7 @@ export default function CustomerDashboard() {
       )}
 
       {isDeleteModalOpen && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">Delete Customer</h2>
             <p className="text-gray-600">
@@ -443,10 +537,7 @@ export default function CustomerDashboard() {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Handle delete logic here
-                  setIsDeleteModalOpen(false);
-                }}
+                onClick={handleDeleteConfirm}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
               >
                 Delete
