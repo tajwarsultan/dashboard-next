@@ -123,6 +123,8 @@ export default function CustomerDashboard() {
 
   const [isMenuOpen, setIsMenuOpen] = useState<number | null>(null);
 
+  const [tempStatus, setTempStatus] = useState<string>('');
+
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          customer.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -166,6 +168,7 @@ export default function CustomerDashboard() {
 
   const handleStatusChange = (customer: Customer) => {
     setSelectedCustomer(customer);
+    setTempStatus(customer.status);
     setIsStatusModalOpen(true);
   };
 
@@ -178,13 +181,13 @@ export default function CustomerDashboard() {
     setIsEditModalOpen(false);
   };
 
-  const handleStatusUpdate = (newStatus: string) => {
+  const handleStatusUpdate = () => {
     if (!selectedCustomer) return;
     
     setCustomers(prevCustomers =>
       prevCustomers.map(customer =>
         customer.id === selectedCustomer.id
-          ? { ...customer, status: newStatus }
+          ? { ...customer, status: tempStatus }
           : customer
       )
     );
@@ -495,9 +498,9 @@ export default function CustomerDashboard() {
             <h2 className="text-xl font-bold mb-4">Change Status</h2>
             <div className="space-y-4">
               <select 
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                defaultValue={selectedCustomer.status}
-                onChange={(e) => handleStatusUpdate(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                value={tempStatus}
+                onChange={(e) => setTempStatus(e.target.value)}
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -512,7 +515,7 @@ export default function CustomerDashboard() {
                 Cancel
               </button>
               <button
-                onClick={() => handleStatusUpdate(selectedCustomer.status)}
+                onClick={handleStatusUpdate}
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
               >
                 Update Status
