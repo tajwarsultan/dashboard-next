@@ -24,7 +24,7 @@ export default function RootLayout({
           <div>
             <Sidebar />
           </div>
-          <div className="pt-16 p-4 max-w-7xl mx-auto">{children}</div>
+          <div className="pt-24 p-4 max-w-full mx-auto">{children}</div>
         </div>
       </body>
     </html>

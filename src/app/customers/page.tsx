@@ -15,7 +15,11 @@ export default function CustomerDashboard() {
       registrationDate: '2023-05-15',
       lastLogin: '2024-02-24',
       orderCount: 12,
-      segment: 'Premium'
+      segment: 'Premium',
+      phone: '+1234567890',
+      location: 'New York, USA',
+      age: 34,
+      referredBy: 'Michael Scott'
     },
     { 
       id: 2, 
@@ -25,9 +29,55 @@ export default function CustomerDashboard() {
       registrationDate: '2022-11-03',
       lastLogin: '2023-12-10',
       orderCount: 5,
-      segment: 'Standard'
+      segment: 'Standard',
+      phone: '+1987654321',
+      location: 'Los Angeles, USA',
+      age: 28,
+      referredBy: null
     },
-  ]);
+    { 
+      id: 3, 
+      name: 'Alice Johnson', 
+      email: 'alice.johnson@example.com', 
+      status: 'active',
+      registrationDate: '2024-01-10',
+      lastLogin: '2025-02-20',
+      orderCount: 8,
+      segment: 'Standard',
+      phone: '+1122334455',
+      location: 'Chicago, USA',
+      age: 30,
+      referredBy: 'John Doe'
+    },
+    { 
+      id: 4, 
+      name: 'Robert Brown', 
+      email: 'robert.brown@example.com', 
+      status: 'suspended',
+      registrationDate: '2021-08-22',
+      lastLogin: '2024-01-15',
+      orderCount: 3,
+      segment: 'Basic',
+      phone: '+3344556677',
+      location: 'Houston, USA',
+      age: 45,
+      referredBy: null
+    },
+    { 
+      id: 5, 
+      name: 'Emily Davis', 
+      email: 'emily.davis@example.com', 
+      status: 'active',
+      registrationDate: '2023-03-11',
+      lastLogin: '2024-02-27',
+      orderCount: 15,
+      segment: 'Premium',
+      phone: '+7788990011',
+      location: 'San Francisco, USA',
+      age: 29,
+      referredBy: 'Jane Smith'
+    }
+  ]);  
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -42,8 +92,8 @@ export default function CustomerDashboard() {
   });
 
   const sortedCustomers = [...filteredCustomers].sort((a, b) => {
-    if (a[sortField as keyof typeof a] < b[sortField as keyof typeof b]) return sortDirection === 'asc' ? -1 : 1;
-    if (a[sortField as keyof typeof a] > b[sortField as keyof typeof b]) return sortDirection === 'asc' ? 1 : -1;
+    if ((a[sortField as keyof typeof a] ?? '') < (b[sortField as keyof typeof b] ?? '')) return sortDirection === 'asc' ? -1 : 1;
+    if ((a[sortField as keyof typeof a] ?? '') > (b[sortField as keyof typeof b] ?? '')) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
 
@@ -57,10 +107,9 @@ export default function CustomerDashboard() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Customer Management</h1>
       
-      {/* Search and Filter Section */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
