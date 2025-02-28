@@ -116,6 +116,12 @@ export default function CustomerDashboard() {
   const [sortField, setSortField] = useState<keyof Customer>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Add new state for modals
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          customer.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -146,6 +152,22 @@ export default function CustomerDashboard() {
   );
 
   const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
+
+  // Add handlers for customer actions
+  const handleEditCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleStatusChange = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsStatusModalOpen(true);
+  };
 
   return (
     <div className="p-4">
@@ -252,12 +274,35 @@ export default function CustomerDashboard() {
                     {customer.segment}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                      Edit
-                    </button>
-                    <button className="text-gray-600 hover:text-gray-900">
-                      <MoreHorizontal size={18} />
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleEditCustomer(customer)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </button>
+                      <div className="relative group">
+                        <button className="text-gray-600 hover:text-gray-900">
+                          <MoreHorizontal size={18} />
+                        </button>
+                        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
+                          <div className="py-1" role="menu">
+                            <button
+                              onClick={() => handleStatusChange(customer)}
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              Change Status
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCustomer(customer)}
+                              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            >
+                              Delete Customer
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -313,6 +358,103 @@ export default function CustomerDashboard() {
           </button>
         </div>
       </div>
+
+      {/* Add Modals */}
+      {isEditModalOpen && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Edit Customer</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Name</label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  defaultValue={selectedCustomer.name}
+                />
+              </div>
+              {/* Add more fields as needed */}
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Handle save logic here
+                  setIsEditModalOpen(false);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isStatusModalOpen && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Change Status</h2>
+            <div className="space-y-4">
+              <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setIsStatusModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Handle status change logic here
+                  setIsStatusModalOpen(false);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+              >
+                Update Status
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Delete Customer</h2>
+            <p className="text-gray-600">
+              Are you sure you want to delete {selectedCustomer.name}? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Handle delete logic here
+                  setIsDeleteModalOpen(false);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
