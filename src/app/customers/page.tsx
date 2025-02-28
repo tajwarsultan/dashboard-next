@@ -5,8 +5,26 @@ import {
   ArrowUpDown, ChevronDown, MoreHorizontal 
 } from 'lucide-react';
 
+type Customer = {
+  id: number;
+  name: string;
+  email: string;
+  status: string;
+  registrationDate: string;
+  lastLogin: string;
+  orderCount: number;
+  segment: string;
+  phone: string;
+  location: string;
+  age: number;
+  referredBy: string | null;
+};
+
 export default function CustomerDashboard() {
-  const [customers] = useState([
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const [customers] = useState<Customer[]>([
     { 
       id: 1, 
       name: 'John Doe', 
@@ -76,28 +94,44 @@ export default function CustomerDashboard() {
       location: 'San Francisco, USA',
       age: 29,
       referredBy: 'Jane Smith'
+    },
+    { 
+      id: 6, 
+      name: 'David Wilson', 
+      email: 'david.wilson@example.com', 
+      status: 'active',
+      registrationDate: '2023-08-15',
+      lastLogin: '2024-02-25',
+      orderCount: 7,
+      segment: 'Standard',
+      phone: '+1234567891',
+      location: 'Miami, USA',
+      age: 32,
+      referredBy: null
     }
-  ]);  
+  ]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [sortField, setSortField] = useState('name');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortField, setSortField] = useState<keyof Customer>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+                         customer.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || customer.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
   const sortedCustomers = [...filteredCustomers].sort((a, b) => {
-    if ((a[sortField as keyof typeof a] ?? '') < (b[sortField as keyof typeof b] ?? '')) return sortDirection === 'asc' ? -1 : 1;
-    if ((a[sortField as keyof typeof a] ?? '') > (b[sortField as keyof typeof b] ?? '')) return sortDirection === 'asc' ? 1 : -1;
+    const aValue = a[sortField] ?? '';
+    const bValue = b[sortField] ?? '';
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
 
-  const handleSort = (field: keyof typeof customers[0]) => {
+  const handleSort = (field: keyof Customer) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -105,6 +139,13 @@ export default function CustomerDashboard() {
       setSortDirection('asc');
     }
   };
+
+  const paginatedCustomers = sortedCustomers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
 
   return (
     <div className="p-4">
@@ -179,8 +220,8 @@ export default function CustomerDashboard() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedCustomers.length > 0 ? (
-              sortedCustomers.map((customer) => (
+            {paginatedCustomers.length > 0 ? (
+              paginatedCustomers.map((customer) => (
                 <tr key={customer.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -234,17 +275,40 @@ export default function CustomerDashboard() {
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-700">
-          Showing <span className="font-medium">{sortedCustomers.length}</span> of{" "}
-          <span className="font-medium">{customers.length}</span> customers
+          Showing <span className="font-medium">
+            {Math.min(currentPage * itemsPerPage, sortedCustomers.length) - itemsPerPage + 1}
+          </span> to{" "}
+          <span className="font-medium">
+            {Math.min(currentPage * itemsPerPage, sortedCustomers.length)}
+          </span> of{" "}
+          <span className="font-medium">{sortedCustomers.length}</span> customers
         </div>
         <div className="flex gap-1">
-          <button className="px-3 py-1 border rounded text-sm" disabled>
+          <button 
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
             Previous
           </button>
-          <button className="px-3 py-1 bg-indigo-600 text-white rounded text-sm">
-            1
-          </button>
-          <button className="px-3 py-1 border rounded text-sm">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index + 1}
+              className={`px-3 py-1 rounded text-sm ${
+                currentPage === index + 1
+                  ? 'bg-indigo-600 text-white'
+                  : 'border'
+              }`}
+              onClick={() => setCurrentPage(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button 
+            className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
             Next
           </button>
         </div>
