@@ -20,11 +20,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-gray-100`}>
         <TopBar />
-        <div className="flex gap-10">
+        <div className="flex lg:gap-10 p-4">
           <div>
             <Sidebar />
           </div>
-          <div className="pt-24 p-4 max-w-full mx-auto">{children}</div>
+          <div className="pt-24 lg:p-4 max-w-full mx-auto">{children}</div>
         </div>
       </body>
     </html>
