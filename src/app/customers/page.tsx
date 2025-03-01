@@ -125,11 +125,36 @@ export default function CustomerDashboard() {
 
   const [tempStatus, setTempStatus] = useState<string>('');
 
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    segment: 'all',
+    minAge: '',
+    maxAge: '',
+    minOrders: '',
+    maxOrders: '',
+    location: '',
+    registrationDateFrom: '',
+    registrationDateTo: '',
+  });
+
   const filteredCustomers = customers.filter(customer => {
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          customer.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'all' || customer.status === selectedStatus;
-    return matchesSearch && matchesStatus;
+    const matchesSegment = filters.segment === 'all' || customer.segment === filters.segment;
+    const matchesAge = (!filters.minAge || customer.age >= Number(filters.minAge)) &&
+                      (!filters.maxAge || customer.age <= Number(filters.maxAge));
+    const matchesOrders = (!filters.minOrders || customer.orderCount >= Number(filters.minOrders)) &&
+                         (!filters.maxOrders || customer.orderCount <= Number(filters.maxOrders));
+    const matchesLocation = !filters.location || 
+                          customer.location.toLowerCase().includes(filters.location.toLowerCase());
+    const matchesRegistrationDate = (!filters.registrationDateFrom || 
+                                    customer.registrationDate >= filters.registrationDateFrom) &&
+                                   (!filters.registrationDateTo || 
+                                    customer.registrationDate <= filters.registrationDateTo);
+
+    return matchesSearch && matchesStatus && matchesSegment && matchesAge && 
+           matchesOrders && matchesLocation && matchesRegistrationDate;
   });
 
   const sortedCustomers = [...filteredCustomers].sort((a, b) => {
@@ -203,6 +228,19 @@ export default function CustomerDashboard() {
     setIsDeleteModalOpen(false);
   };
 
+  const handleFilterReset = () => {
+    setFilters({
+      segment: 'all',
+      minAge: '',
+      maxAge: '',
+      minOrders: '',
+      maxOrders: '',
+      location: '',
+      registrationDateFrom: '',
+      registrationDateTo: '',
+    });
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Customer Management</h1>
@@ -234,7 +272,10 @@ export default function CustomerDashboard() {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
           </div>
           
-          <button className="flex items-center gap-1 px-4 py-2 bg-white border rounded">
+          <button 
+            className="flex items-center gap-1 px-4 py-2 bg-white border rounded hover:bg-gray-50"
+            onClick={() => setIsFilterModalOpen(true)}
+          >
             <Filter size={18} />
             <span>More Filters</span>
           </button>
@@ -544,6 +585,119 @@ export default function CustomerDashboard() {
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
+            <h2 className="text-xl font-bold mb-4">Advanced Filters</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Segment</label>
+                <select
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                  value={filters.segment}
+                  onChange={(e) => setFilters({...filters, segment: e.target.value})}
+                >
+                  <option value="all">All Segments</option>
+                  <option value="Basic">Basic</option>
+                  <option value="Standard">Standard</option>
+                  <option value="Premium">Premium</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Location</label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                  value={filters.location}
+                  onChange={(e) => setFilters({...filters, location: e.target.value})}
+                  placeholder="Filter by location..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Age Range</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    value={filters.minAge}
+                    onChange={(e) => setFilters({...filters, minAge: e.target.value})}
+                    placeholder="Min"
+                  />
+                  <input
+                    type="number"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    value={filters.maxAge}
+                    onChange={(e) => setFilters({...filters, maxAge: e.target.value})}
+                    placeholder="Max"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Order Count</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    value={filters.minOrders}
+                    onChange={(e) => setFilters({...filters, minOrders: e.target.value})}
+                    placeholder="Min"
+                  />
+                  <input
+                    type="number"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    value={filters.maxOrders}
+                    onChange={(e) => setFilters({...filters, maxOrders: e.target.value})}
+                    placeholder="Max"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Registration Date</label>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    value={filters.registrationDateFrom}
+                    onChange={(e) => setFilters({...filters, registrationDateFrom: e.target.value})}
+                  />
+                  <input
+                    type="date"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                    value={filters.registrationDateTo}
+                    onChange={(e) => setFilters({...filters, registrationDateTo: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={handleFilterReset}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Reset Filters
+              </button>
+              <button
+                onClick={() => setIsFilterModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setIsFilterModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+              >
+                Apply Filters
               </button>
             </div>
           </div>
