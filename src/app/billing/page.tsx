@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 export default function BillingPage() {
   const transactions = [
@@ -34,6 +35,19 @@ export default function BillingPage() {
             <div>
               <Button variant="destructive">Cancel Subscription</Button>
             </div>
+            <div className="col-span-full mt-4">
+              <p className="text-sm text-gray-600 mb-2">Usage This Month</p>
+              <div className="flex gap-4">
+                <div className="flex-1 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">API Calls</p>
+                  <p className="font-medium">8,542 / 10,000</p>
+                </div>
+                <div className="flex-1 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">Storage Used</p>
+                  <p className="font-medium">2.1GB / 5GB</p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -44,15 +58,28 @@ export default function BillingPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Input placeholder="Card Number" />
-            <Button>Update Payment Method</Button>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex-1">
+                <p className="font-medium">•••• •••• •••• 4242</p>
+                <p className="text-sm text-gray-600">Expires 12/25</p>
+              </div>
+              <Badge>Default</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input placeholder="Card Number" />
+              <Input placeholder="Card Holder Name" />
+              <Input placeholder="Expiry Date (MM/YY)" />
+              <Input placeholder="CVC" />
+            </div>
+            <Button className="w-full">Update Payment Method</Button>
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Transaction History</CardTitle>
+          <Button variant="outline" size="sm">Download All</Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -62,6 +89,7 @@ export default function BillingPage() {
                 <TableHead>Date</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -70,7 +98,14 @@ export default function BillingPage() {
                   <TableCell>{tx.id}</TableCell>
                   <TableCell>{tx.date}</TableCell>
                   <TableCell>{tx.amount}</TableCell>
-                  <TableCell>{tx.status}</TableCell>
+                  <TableCell>
+                    <Badge variant={tx.status === 'Paid' ? 'default' : 'secondary'}>
+                      {tx.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm">Download</Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
