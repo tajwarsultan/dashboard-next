@@ -57,7 +57,6 @@ const footerItems: NavItem[] = [
 const Sidebar: React.FC = () => {
   return (
     <div className="hidden lg:flex flex-col fixed left-0 z-20 top-16 bottom-0 w-64 bg-white shadow-md">
-      {/* Main Navigation Section */}
       <nav className="flex-grow p-4 space-y-2">
         {navItems.map((item) => (
           <Link 
@@ -78,7 +77,6 @@ const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* Footer Navigation Section */}
       <div className="border-t p-4 space-y-2">
         {footerItems.map((item) => (
           <Link 
@@ -104,10 +102,10 @@ const Sidebar: React.FC = () => {
         <div className="bg-gray-200 rounded-full h-10 w-10 flex items-center justify-center">
           <span className="text-gray-600 font-bold">JD</span>
         </div>
-        <div>
+        <a href="/profile">
           <div className="font-semibold">John Doe</div>
           <div className="text-xs text-gray-500">john.doe@example.com</div>
-        </div>
+        </a>
       </div>
     </div>
   );
