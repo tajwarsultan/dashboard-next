@@ -6,7 +6,8 @@ import {
   CreditCard, 
   Settings, 
   HelpCircle, 
-  LineChart 
+  LineChart,
+  Airplay
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -37,6 +38,11 @@ const navItems: NavItem[] = [
     href: '/billing',
     label: 'Billing',
     icon: CreditCard
+  },
+  {
+    href: '/report',
+    label: 'Report',
+    icon: Airplay
   }
 ];
 
