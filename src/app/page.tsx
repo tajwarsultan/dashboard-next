@@ -8,7 +8,6 @@ import {
   Plus, 
   ArrowRight,  
   AlertTriangle,
-  CheckCircle,
   Users,
   Activity,
   Search,
@@ -19,7 +18,6 @@ import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/componen
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 
 export default function HomePage() {
   const [stats] = useState({
@@ -130,7 +128,6 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Stats Section - Enhanced with more metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <Card>
           <CardContent className="pt-6">
@@ -174,11 +171,8 @@ export default function HomePage() {
         </Card>
       </div>
 
-      {/* Two-column layout for main content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column - 2/3 width */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Recent Activity */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center gap-2">
@@ -196,10 +190,7 @@ export default function HomePage() {
                           <Link href={`/issue/${item.id}`}>
                             <span className="font-mono text-sm text-muted-foreground">{item.id}</span>
                           </Link>
-                          <Badge variant={item.status === 'open' ? 'destructive' : 
-                                         item.status === 'in-progress' ? 'warning' : 'success'}>
-                            {item.status}
-                          </Badge>
+                         
                           <Badge variant="outline">{item.priority}</Badge>
                         </div>
                         <Link href={`/issue/${item.id}`}>
@@ -233,7 +224,6 @@ export default function HomePage() {
             </CardFooter>
           </Card>
 
-          {/* Team Performance */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center gap-2">
@@ -251,7 +241,6 @@ export default function HomePage() {
                         {team.resolved}/{team.total} issues ({Math.round((team.resolved / team.total) * 100)}%)
                       </span>
                     </div>
-                    <Progress value={(team.resolved / team.total) * 100} />
                   </div>
                 ))}
               </div>
@@ -259,9 +248,7 @@ export default function HomePage() {
           </Card>
         </div>
 
-        {/* Right column - 1/3 width */}
         <div className="space-y-6">
-          {/* Priority Issues */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center gap-2">
@@ -283,7 +270,6 @@ export default function HomePage() {
                     <AlertTriangle className="w-4 h-4 text-amber-500" />
                     <span className="font-medium">BUG-419</span>
                   </div>
-                  <Badge variant="warning">High</Badge>
                 </div>
               </div>
             </CardContent>
@@ -296,7 +282,6 @@ export default function HomePage() {
             </CardFooter>
           </Card>
 
-          {/* Quick Actions Section */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl">Quick Actions</CardTitle>
@@ -313,7 +298,6 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          {/* System Status */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl">System Status</CardTitle>
@@ -322,21 +306,12 @@ export default function HomePage() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span>API Server</span>
-                  <Badge variant="success" className="flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" /> Operational
-                  </Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Database</span>
-                  <Badge variant="success" className="flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" /> Operational
-                  </Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Authentication</span>
-                  <Badge variant="success" className="flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" /> Operational
-                  </Badge>
                 </div>
               </div>
             </CardContent>
@@ -344,7 +319,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* CTA Section */}
       <div className="pt-8 text-center">
         <Link href="/report">
           <Button size="lg" className="gap-2">
