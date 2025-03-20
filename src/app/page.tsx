@@ -96,7 +96,6 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto py-10 space-y-8">
-      {/* Header with Search and Notifications */}
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-64">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -117,7 +116,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Hero Section */}
       <div className="text-center space-y-4 pb-8">
         <h1 className="text-4xl font-bold flex items-center justify-center gap-2">
           <Flag className="w-8 h-8" />
