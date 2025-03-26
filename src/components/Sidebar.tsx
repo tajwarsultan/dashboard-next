@@ -7,7 +7,8 @@ import {
   Settings, 
   HelpCircle, 
   LineChart,
-  Airplay
+  Airplay,
+  CircleUserRound
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -43,6 +44,11 @@ const navItems: NavItem[] = [
     href: '/report',
     label: 'Report',
     icon: Airplay
+  }
+  ,{
+    href: '/buyers',
+    label: 'Buyers',
+    icon: CircleUserRound
   }
 ];
 
