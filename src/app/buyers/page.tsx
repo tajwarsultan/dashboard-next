@@ -46,6 +46,15 @@ export default function BuyersPage() {
     // Add more dummy data as needed
   ])
 
+  const handleDelete = (id: string) => {
+    setBuyers(buyers.filter(buyer => buyer.id !== id))
+  }
+
+  const handleEdit = (buyer: Buyer) => {
+    // Implement edit functionality
+    console.log("Editing buyer:", buyer)
+  }
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -105,8 +114,13 @@ export default function BuyersPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
+                    <DropdownMenuItem onClick={() => handleEdit(buyer)}>
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleDelete(buyer.id)}
+                      className="text-red-600"
+                    >
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
