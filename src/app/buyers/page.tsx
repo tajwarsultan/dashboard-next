@@ -43,7 +43,30 @@ export default function BuyersPage() {
       company: "Tech Corp",
       status: "active",
     },
-    // Add more dummy data as needed
+    {
+      id: "2",
+      name: "Ser Doe",
+      email: "sere@example.com",
+      phone: "+1 234 567 870",
+      company: "Tech Corp",
+      status: "active",
+    },
+    {
+      id: "3",
+      name: "John Pon",
+      email: "pon@example.com",
+      phone: "+1 234 567 890",
+      company: "Tech Corp",
+      status: "active",
+    },
+    {
+      id: "4",
+      name: "John Sogo",
+      email: "sogo@example.com",
+      phone: "+1 234 567 890",
+      company: "Tech Corp",
+      status: "inactive",
+    },
   ])
 
   const handleDelete = (id: string) => {
@@ -51,7 +74,6 @@ export default function BuyersPage() {
   }
 
   const handleEdit = (buyer: Buyer) => {
-    // Implement edit functionality
     console.log("Editing buyer:", buyer)
   }
 
