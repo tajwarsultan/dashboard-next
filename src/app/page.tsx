@@ -84,7 +84,7 @@ export default function HomePage() {
       title: "View Reports",
       icon: <LineChart className="w-5 h-5" />,
       description: "See all submitted reports",
-      link: "/reports"
+      link: "/report"
     }
   ];
 
@@ -213,7 +213,7 @@ export default function HomePage() {
               </div>
             </CardContent>
             <CardFooter className="pt-0">
-              <Link href="/reports" className="w-full">
+              <Link href="/report" className="w-full">
                 <Button variant="outline" className="w-full">
                   View All Reports
                   <ArrowRight className="ml-2 w-4 h-4" />
