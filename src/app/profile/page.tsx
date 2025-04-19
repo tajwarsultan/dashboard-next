@@ -58,7 +58,7 @@ export default function ProfilePage() {
   });
 
   const [originalData, setOriginalData] = useState({ ...profileData });
-  const [isEditing, setIsEditing] = useState(false);
+  const [, setIsEditing] = useState(false);
 
   const handleSaveChanges = () => {
     setOriginalData({ ...profileData });
